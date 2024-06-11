@@ -13,9 +13,8 @@ def load_interactions(data_folder: str):
     # pk: Ligand ID,Target ID,Target Ligand ID,Target Species
     # inner join of primary_targets_csv[pk] and detailed_csv[pk] is primary_targets_csv[pk]
     with open(infile, "r") as data_fd:
+        next(data_fd)  # skip metadata row
         reader = csv.DictReader(data_fd)
-        next(reader)  # skip first two rows
-        next(reader)
         idx = 0
 
         for row in reader:
