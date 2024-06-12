@@ -10,6 +10,7 @@
         "uncompress" : false
     },
     "uploader" : {
+        "name": "interactions",
         "parser" : "parser:load_interactions",
         "on_duplicates" : "ignore"
     }
