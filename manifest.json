@@ -6,12 +6,22 @@
         "url" : "https://www.guidetopharmacology.org"
     },
     "dumper" : {
-        "data_url" : "https://www.guidetopharmacology.org/DATA/approved_drug_detailed_interactions.csv",
+        "data_url" : [
+            "https://www.guidetopharmacology.org/DATA/approved_drug_detailed_interactions.csv",
+            "https://www.guidetopharmacology.org/DATA/ligands.csv"
+        ],
         "uncompress" : false
     },
-    "uploader" : {
-        "name": "interactions",
-        "parser" : "parser:load_interactions",
-        "on_duplicates" : "ignore"
-    }
+    "uploaders" : [
+        {
+            "name": "interactions",
+            "parser" : "parser:load_interactions",
+            "on_duplicates" : "ignore"
+        },
+        {
+            "name": "ligands",
+            "parser": "parser:load_ligands",
+            "on_duplicates": "ignore"
+        }
+    ]
 }
