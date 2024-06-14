@@ -165,3 +165,7 @@ cython_debug/
 .pre-commit-config.yaml
 *.csv
 *.toml
+
+# biothings-cli
+.biothings_hub/
+*.pick
