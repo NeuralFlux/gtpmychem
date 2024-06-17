@@ -46,7 +46,9 @@ def load_ligands(data_folder: str):
         row.pop("Ligand ID")  # redundant since present in ligands
 
         # NOTE: we assume ligand IDs in interactions will be found in ligands
-        ligands[ligand_id].setdefault("interactions", []).append(preprocess_data(row))
+        if "interactions" not in ligands[ligand_id].keys():
+            ligands[ligand_id]["interactions"] = []
+        ligands[ligand_id]["interactions"].append(preprocess_data(row))
 
     for k, ligand in ligands.items():
         ligand["_id"] = k
