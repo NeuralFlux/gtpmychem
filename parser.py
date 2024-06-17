@@ -45,12 +45,14 @@ def load_ligands(data_folder: str):
         # NOTE: we assume ligand IDs in interactions will be found in ligands
         if "interaction_targets" not in ligands[ligand_id].keys():
             ligands[ligand_id]["interaction_targets"] = []
-
             ligands[ligand_id]["CAS Number"] = row["CAS Number"]
             ligands[ligand_id]["Clinical Use Comment"] = row["Clinical Use Comment"]
 
-        # redundant since present in ligands
         row["Name"] = row["Target"]
+        if isinstance(row["Target Species"], str):
+            row["Target Species"] = row["Target Species"].lower()
+
+        # redundant since present in ligands
         cols_to_drop = [
             "Ligand ID",
             "CAS Number",
