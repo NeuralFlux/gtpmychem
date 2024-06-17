@@ -22,12 +22,12 @@ def load_interactions(data_folder: str):
         reader = csv.DictReader(data_fd)
 
         for row in reader:
-            row["_id"] = row["ligand_id"]
-
             # remove keys with empty string OR list of empty strings
             row = dict_sweep(row, vals=[""], remove_invalid_list=True)
             row = dict_convert(row, keyfn=process_key)
             row = dict_convert(row, valuefn=process_val)
+
+            row["_id"] = row["ligand_id"]
             yield row
 
 
@@ -40,10 +40,10 @@ def load_ligands(data_folder: str):
         reader = csv.DictReader(data_fd)
 
         for row in reader:
-            row["_id"] = row["ligand_id"]
-
             # remove keys with empty string OR list of empty strings
             row = dict_sweep(row, vals=[""], remove_invalid_list=True)
             row = dict_convert(row, keyfn=process_key)
             row = dict_convert(row, valuefn=process_val)
+
+            row["_id"] = row["ligand_id"]
             yield row
