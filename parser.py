@@ -2,8 +2,13 @@ import csv
 import os
 
 from biothings import config
+from biothings.utils.dataload import dict_convert, dict_sweep
 
 logging = config.logger
+
+VAL_MAP = {"yes": True, "no": False}
+process_key = lambda key: key.replace(" ", "_").lower()
+process_val = lambda val: VAL_MAP[val] if val in VAL_MAP.keys() else val
 
 
 def load_interactions(data_folder: str):
@@ -18,6 +23,11 @@ def load_interactions(data_folder: str):
 
         for row in reader:
             row["_id"] = row["Ligand ID"]
+
+            # remove keys with empty string OR list of empty strings
+            row = dict_sweep(row, vals=[""], remove_invalid_list=True)
+            row = dict_convert(row, keyfn=process_key)
+            row = dict_convert(row, valuefn=process_val)
             yield row
 
 
@@ -31,4 +41,9 @@ def load_ligands(data_folder: str):
 
         for row in reader:
             row["_id"] = row["Ligand ID"]
+
+            # remove keys with empty string OR list of empty strings
+            row = dict_sweep(row, vals=[""], remove_invalid_list=True)
+            row = dict_convert(row, keyfn=process_key)
+            row = dict_convert(row, valuefn=process_val)
             yield row
