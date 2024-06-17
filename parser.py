@@ -31,9 +31,7 @@ def load_ligands(data_folder: str):
         .rename({"Ligand ID": "_id"}, axis=1)
         .set_index("_id")
     )
-    interactions_df = pd.read_csv(interactions_file, skiprows=1, dtype=object).rename(
-        {"Ligand": "Name"}, axis=1
-    )
+    interactions_df = pd.read_csv(interactions_file, skiprows=1, dtype=object)
 
     # drop redundant common columns from interactions
     cols_to_drop = ligands_df.columns.intersection(interactions_df.columns)
@@ -43,13 +41,31 @@ def load_ligands(data_folder: str):
 
     for row in interactions:
         ligand_id = str(row["Ligand ID"])
-        row.pop("Ligand ID")  # redundant since present in ligands
 
         # NOTE: we assume ligand IDs in interactions will be found in ligands
-        if "interactions" not in ligands[ligand_id].keys():
-            ligands[ligand_id]["interactions"] = []
-        ligands[ligand_id]["interactions"].append(preprocess_data(row))
+        if "interaction_targets" not in ligands[ligand_id].keys():
+            ligands[ligand_id]["interaction_targets"] = []
+
+            ligands[ligand_id]["CAS Number"] = row["CAS Number"]
+            ligands[ligand_id]["Clinical Use Comment"] = row["Clinical Use Comment"]
+
+        # redundant since present in ligands
+        row["Name"] = row["Target"]
+        cols_to_drop = [
+            "Ligand ID",
+            "CAS Number",
+            "Clinical Use Comment",
+            "Ligand Synonyms",
+            "Target",
+            "Ligand",
+        ]
+        for col in cols_to_drop:
+            row.pop(col)
+
+        ligands[ligand_id]["interaction_targets"].append(preprocess_data(row))
 
     for k, ligand in ligands.items():
         ligand["_id"] = k
+        if isinstance(ligand["Synonyms"], str):
+            ligand["Synonyms"] = ligand["Synonyms"].split("|")
         yield preprocess_data(ligand)
