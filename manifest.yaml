@@ -8,7 +8,7 @@ dumper:
     - https://www.guidetopharmacology.org/DATA/approved_drug_detailed_interactions.csv
     - https://www.guidetopharmacology.org/DATA/ligands.csv
   uncompress: false
-uploaders:
-  - name: ligands
-    parser: parser:load_ligands
-    on_duplicates: ignore
+uploader:
+  name: ligands
+  parser: parser:load_ligands
+  on_duplicates: ignore
