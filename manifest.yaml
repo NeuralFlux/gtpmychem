@@ -9,9 +9,6 @@ dumper:
     - https://www.guidetopharmacology.org/DATA/ligands.csv
   uncompress: false
 uploaders:
-  - name: interactions
-    parser: parser:load_interactions
-    on_duplicates: ignore
   - name: ligands
     parser: parser:load_ligands
     on_duplicates: ignore
