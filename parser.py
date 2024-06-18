@@ -1,11 +1,57 @@
 import os
+import re
 
+import numpy as np
 import pandas as pd
 from biothings import config
-
-import utils as ligand_utils
+from biothings.utils.dataload import dict_convert, dict_sweep
 
 logging = config.logger
+
+VAL_MAP = {"yes": True, "no": False}
+process_key = lambda key: key.replace(" ", "_").lower()
+process_val = lambda val: VAL_MAP[val] if isinstance(val, str) and val in VAL_MAP.keys() else val
+intrs_rename_dict = {
+    "Target Ensembl Gene ID": "Ensembl Gene",
+    "Target Entrez Gene ID": "Entrez Gene",
+    "Target Gene Name": "Gene Name",
+    "Target Species": "Species",
+}
+
+
+def preprocess_ligands(d: dict):
+    if isinstance(d["Synonyms"], str):
+        d["Synonyms"] = d["Synonyms"].split("|")
+    d = dict_sweep(d, vals=["", np.nan], remove_invalid_list=True)
+    d = dict_convert(d, keyfn=process_key)
+    d = dict_convert(d, valuefn=process_val)
+    return d
+
+
+def preprocess_intrs(d: dict):
+    d["Name"] = d["Target"]
+    if isinstance(d["Species"], str):
+        d["Species"] = d["Species"].lower()
+    if isinstance(d["Name"], str):
+        d["Name"] = re.sub(r"</?sub>", "", d["Name"])  # replace subscript tags
+
+    # redundant since present in ligands
+    cols_to_drop = [
+        "Ligand ID",
+        "CAS Number",
+        "Clinical Use Comment",
+        "Ligand Synonyms",
+        "Target",
+        "Ligand",
+        "Type",
+        "SMILES",
+    ]
+    for col in cols_to_drop:
+        d.pop(col)
+
+    d = dict_sweep(d, vals=["", np.nan], remove_invalid_list=True)
+    d = dict_convert(d, keyfn=process_key)
+    return d
 
 
 def load_ligands(data_folder: str):
@@ -23,7 +69,7 @@ def load_ligands(data_folder: str):
     )
     interactions = (
         pd.read_csv(interactions_file, skiprows=1, dtype=object)
-        .rename(ligand_utils.intrs_rename_dict, axis=1)
+        .rename(intrs_rename_dict, axis=1)
         .to_dict(orient="records")
     )
     assert type(list(ligands.keys())[0]) == str
@@ -37,8 +83,8 @@ def load_ligands(data_folder: str):
             ligands[ligand_id]["CAS Number"] = row["CAS Number"]
             ligands[ligand_id]["Clinical Use Comment"] = row["Clinical Use Comment"]
 
-        ligands[ligand_id]["interaction_targets"].append(ligand_utils.preprocess_intrs(row))
+        ligands[ligand_id]["interaction_targets"].append(preprocess_intrs(row))
 
     for k, ligand in ligands.items():
         ligand["_id"] = k
-        yield ligand_utils.preprocess_ligands(ligand)
+        yield preprocess_ligands(ligand)
