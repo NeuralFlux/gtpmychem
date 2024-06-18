@@ -12,6 +12,5 @@ dumper:
     - https://www.guidetopharmacology.org/DATA/ligands.csv
   uncompress: false
 uploader:
-  name: ligands
   parser: parser:load_ligands
   on_duplicates: ignore
