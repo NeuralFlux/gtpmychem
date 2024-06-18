@@ -1,6 +1,6 @@
 import os
-import re
 
+import lxml.html
 import numpy as np
 import pandas as pd
 from biothings import config
@@ -11,6 +11,9 @@ logging = config.logger
 VAL_MAP = {"yes": True, "no": False}
 process_key = lambda key: key.replace(" ", "_").lower()
 process_val = lambda val: VAL_MAP[val] if isinstance(val, str) and val in VAL_MAP.keys() else val
+remove_tags = lambda val: (
+    lxml.html.document_fromstring(val).text_content() if isinstance(val, str) else val
+)
 intrs_rename_dict = {
     "Target Ensembl Gene ID": "Ensembl Gene",
     "Target Entrez Gene ID": "Entrez Gene",
@@ -25,6 +28,7 @@ def preprocess_ligands(d: dict):
     d = dict_sweep(d, vals=["", np.nan], remove_invalid_list=True)
     d = dict_convert(d, keyfn=process_key)
     d = dict_convert(d, valuefn=process_val)
+    d = dict_convert(d, valuefn=remove_tags)
     return d
 
 
@@ -32,14 +36,13 @@ def preprocess_intrs(d: dict):
     d["Name"] = d["Target"]
     if isinstance(d["Species"], str):
         d["Species"] = d["Species"].lower()
-    if isinstance(d["Name"], str):
-        d["Name"] = re.sub(r"</?sub>", "", d["Name"])  # replace subscript tags
 
     # redundant since present in ligands
     cols_to_drop = [
         "Ligand ID",
         "CAS Number",
         "Clinical Use Comment",
+        "Bioactivity Comment",
         "Ligand Synonyms",
         "Target",
         "Ligand",
@@ -51,6 +54,7 @@ def preprocess_intrs(d: dict):
 
     d = dict_sweep(d, vals=["", np.nan], remove_invalid_list=True)
     d = dict_convert(d, keyfn=process_key)
+    d = dict_convert(d, valuefn=remove_tags)
     return d
 
 
@@ -82,6 +86,7 @@ def load_ligands(data_folder: str):
             ligands[ligand_id]["interaction_targets"] = []
             ligands[ligand_id]["CAS Number"] = row["CAS Number"]
             ligands[ligand_id]["Clinical Use Comment"] = row["Clinical Use Comment"]
+            ligands[ligand_id]["Bioactivity Comment"] = row["Bioactivity Comment"]
 
         ligands[ligand_id]["interaction_targets"].append(preprocess_intrs(row))
 
