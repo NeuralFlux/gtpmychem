@@ -44,6 +44,9 @@ def preprocess_ligands(d: dict):
         d["_id"] = f"pubchem.compound:{d['pubchem_cid']}"
     elif "pubchem_sid" in d.keys() and not d["sid_dup"]:
         d["_id"] = f"pubchem.substance:{d['pubchem_sid']}"
+
+    for key in ["inchikey_dup", "cid_dup", "sid_dup"]:
+        d.pop(key)
     return d
 
 
