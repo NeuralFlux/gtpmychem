@@ -32,8 +32,7 @@ def preprocess_ligands(d: dict, _id: str):
     Returns:
         Tuple[dict, str]: processed ligand properties, and _id
     """
-    if isinstance(d["Synonyms"], str):
-        d["Synonyms"] = d["Synonyms"].split("|")
+
     d = dict_sweep(d, vals=["", np.nan], remove_invalid_list=True)
     d = dict_convert(d, keyfn=process_key)
     d = dict_convert(d, valuefn=process_val)
@@ -49,6 +48,21 @@ def preprocess_ligands(d: dict, _id: str):
     for key in ["inchikey_dup", "cid_dup", "sid_dup"]:
         d.pop(key)
 
+    if "cas_number" in d.keys():
+        d["cas"] = d.pop("cas_number")
+
+    if "type" in d.keys():
+        d["type"] = d["type"].lower()
+    if "species" in d.keys():
+        d["species"] = d["species"].lower()
+
+    if "synonyms" in d.keys():
+        d["synonyms"] = d["synonyms"].split("|")
+    if "uniprot_id" in d.keys():
+        d["uniprot_id"] = d["uniprot_id"].split("|")
+    if "ensembl_id" in d.keys():
+        d["ensembl_id"] = d["ensembl_id"].split("|")
+
     return d, _id
 
 
@@ -62,8 +76,6 @@ def preprocess_intrs(d: dict):
         dict: processed interaction properties
     """
     d["Name"] = d["Target"]
-    if isinstance(d["Species"], str):
-        d["Species"] = d["Species"].lower()
 
     # redundant since present in ligands
     cols_to_drop = [
