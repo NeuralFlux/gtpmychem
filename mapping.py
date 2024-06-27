@@ -10,9 +10,9 @@ def get_customized_mapping(cls):
                 "pubchem_cid": {"normalizer": "keyword_lowercase_normalizer", "type": "keyword"},
                 "inn": {"type": "text"},
                 "synonyms": {"type": "text"},
-                "smiles": {"normalizer": "keyword_lowercase_normalizer", "type": "keyword"},
-                "inchikey": {"normalizer": "keyword_lowercase_normalizer", "type": "keyword"},
-                "inchi": {"normalizer": "keyword_lowercase_normalizer", "type": "keyword"},
+                "smiles": {"type": "keyword"},
+                "inchikey": {"type": "keyword"},
+                "inchi": {"type": "keyword"},
                 "interaction_targets": {
                     "properties": {
                         "target_id": {
