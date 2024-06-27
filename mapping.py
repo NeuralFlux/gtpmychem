@@ -4,6 +4,7 @@ def get_customized_mapping(cls):
             "properties": {
                 "name": {"type": "text"},
                 "type": {"type": "text"},
+                "ligand_id": {"normalizer": "keyword_lowercase_normalizer", "type": "keyword"},
                 "approved": {"type": "boolean"},
                 "pubchem_sid": {"normalizer": "keyword_lowercase_normalizer", "type": "keyword"},
                 "pubchem_cid": {"normalizer": "keyword_lowercase_normalizer", "type": "keyword"},
