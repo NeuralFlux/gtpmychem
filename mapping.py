@@ -30,7 +30,7 @@ def get_customized_mapping(cls):
                         "name": {"type": "text"},
                     }
                 },
-                "cas_number": {"normalizer": "keyword_lowercase_normalizer", "type": "keyword"},
+                "cas": {"normalizer": "keyword_lowercase_normalizer", "type": "keyword"},
                 "clinical_use_comment": {"type": "text"},
                 "iupac_name": {"type": "text"},
                 "gtoimmupdb": {"type": "boolean"},
