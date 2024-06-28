@@ -114,6 +114,7 @@ def parse_xrefs(d: dict):
                 new_k = "ensembl"
 
             xrefs[new_k] = d[k]
+            d.pop(k)
     return xrefs
 
 
