@@ -20,6 +20,7 @@ intrs_rename_dict = {
     "Target Gene Name": "Symbol",
     "Target Species": "Species",
 }
+recognized_code_systems = ["cas", "pubchem_cid", "pubchem_sid", "uniprot_id", "ensembl_id"]
 
 
 def preprocess_ligands(d: dict, _id: str):
@@ -63,6 +64,10 @@ def preprocess_ligands(d: dict, _id: str):
     if "ensembl_id" in d.keys():
         d["ensembl_id"] = d["ensembl_id"].split("|")
 
+    xrefs = parse_xrefs(d)
+    if len(xrefs) > 0:
+        d["xrefs"] = xrefs
+
     return d, _id
 
 
@@ -92,10 +97,24 @@ def preprocess_intrs(d: dict):
     for col in cols_to_drop:
         d.pop(col)
 
-    d = dict_sweep(d, vals=["", np.nan], remove_invalid_list=True)
     d = dict_convert(d, keyfn=process_key)
     d = dict_convert(d, valuefn=remove_tags)
+    d = dict_sweep(d, vals=["", np.nan], remove_invalid_list=True)
     return d
+
+
+def parse_xrefs(d: dict):
+    xrefs = {}
+    for k in recognized_code_systems:
+        new_k = k
+        if k in d.keys():
+            if k == "uniprot_id":
+                new_k = "uniprotkb"
+            elif k == "ensembl_id":
+                new_k = "ensembl"
+
+            xrefs[new_k] = d[k]
+    return xrefs
 
 
 def load_ligands(data_folder: str):
